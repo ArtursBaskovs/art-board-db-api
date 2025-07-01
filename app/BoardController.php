@@ -2,52 +2,111 @@
 
 namespace App;
 
+use App\JsonResponseHandler;
 
 class BoardController
 {
     private ?array $partsOfUrl;
     private ?string $resource;
     private ?string $boardId;
+    //collects all messages in controller and then echoes it to a client side
+    private JsonResponseHandler $respond;
 
     public function __construct(private BoardGateway $gateway, ?array $partsOfUrl = null)
     {
         $this->partsOfUrl = $partsOfUrl;
         $this->resource = $partsOfUrl[0] ?? null;
         $this->boardId = $partsOfUrl[1] ?? null;
+        $this->respond = new JsonResponseHandler;
     }
 
     public function processRequest(string $requestMethod): void
     {
-        $this->processDataRequest($requestMethod);
+        if ($requestMethod == "POST") $this->processPOST();
+
+        if ($requestMethod == "GET") $this->processGET();
+
+        if ($requestMethod == "PATCH") $this->processPATCH();
+
+        if ($requestMethod == "DELETE") $this->processDELETE();
+
+        if ($requestMethod != null) $this->respond->getResponseJson();
+    }
+    private function processPOST()
+    {
+        $data = file_get_contents("php://input");
+        if ($data == null) {
+            http_response_code(422);
+            echo "Recieved null. JSON data is required.";
+            return;
+        }
+
+        $jsonData = json_decode($data, true);
+        //var_dump($jsonData);
+        $newBoardID = $this->gateway->insertData($jsonData);
+
+        http_response_code(201);
+        $this->respond->addResponse("Message", "New board was saved in database");
+        $this->respond->addResponse("Data", $newBoardID);
+        //echo "New board was saved in database ";
+        //echo $newBoardID;
+    }
+    private function processGET()
+    {
+        $id = $this->boardId;
+        $doesBoardExist = $this->boardIDExists();
+        if ($doesBoardExist) {
+            $result = $this->gateway->getBoardDataByID($id);
+            $jsonData = json_encode($result, JSON_PRETTY_PRINT);
+            echo $jsonData;
+        }
+    }
+    private function processPATCH()
+    {
+        $id = $this->boardId;
+        $doesBoardExist = $this->boardIDExists();
+        if (!$doesBoardExist) return;
+
+        $data = file_get_contents("php://input");
+        if ($data == null) {
+            http_response_code(422);
+            echo "Recieved null. JSON data is required.";
+            return;
+        }
+
+        $jsonData = json_decode($data, true);
+        $this->gateway->updateData($jsonData, $id);
+        echo "Updated data for board with ID: " . $id;
+    }
+    private function processDELETE()
+    {
+        $id = $this->boardId;
+        $doesBoardExist = $this->boardIDExists();
+        if (!$doesBoardExist) return;
+
+        $this->gateway->deleteBoard($id);
+        echo "Deleted board: " . $id;
     }
 
-    private function processDataRequest(string $method): void
+
+    private function boardIDexists(): bool
     {
         $boardIdExists = false;
+        //check existance in db only if id was even passed
         if ($this->boardId) {
             $boardIdExists = $this->gateway->doesValueExist('boards', 'id', $this->boardId);
         } else {
-            var_dump("no board found with this id");
+            http_response_code(422);
+            echo "No board ID was passed in this request";
+            return false;
         }
-        if ($method == "POST") {
-            $data = file_get_contents("php://input");
-            $jsonData = json_decode($data, true);
-            //var_dump($jsonData);
-            $this->gateway->insertData($jsonData);
-        }
-        if ($method == "GET" && $boardIdExists) {
-            var_dump("this board exists");
-            $this->gateway->getBoardDataByID($this->boardId);
-        }
-        if ($method == "PATCH" && $boardIdExists) {
-            var_dump("This board exists. Updating now");
-            $data = file_get_contents("php://input");
-            $jsonData = json_decode($data, true);
-
-            $this->gateway->updateData($jsonData, $this->boardId);
-        }
-        if ($method == "DELETE" && $boardIdExists) {
-            $this->gateway->deleteBoard($this->boardId);
+        if ($boardIdExists) {
+            return true;
+        } else {
+            http_response_code(404);
+            echo "No board found with this id: " . $this->boardId;
+            return false;
+            exit;
         }
     }
 }

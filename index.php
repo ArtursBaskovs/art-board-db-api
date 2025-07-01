@@ -29,8 +29,10 @@ $boardController = new BoardController($boardGateway, $partsOfUrl);
 $boardController->processRequest($_SERVER['REQUEST_METHOD']);
 
 //checking if db connection works
+/*
 if ($conn) {
     echo "connection to db succesful";
 } else {
     echo "no connection to db :(";
 }
+*/

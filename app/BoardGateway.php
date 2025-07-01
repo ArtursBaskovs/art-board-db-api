@@ -28,10 +28,7 @@ class BoardGateway
         $this->insertBoardElements('images', $boardID, $imagesArray);
 
         //send it to front end for user to know and redirect to created board
-        $this->getlastSavedBoardLink($boardID);
-
-        //  Also i need to check somehow if board is new or user saves existing, 
-        //meaning that i just need to rewrite existing board with same link
+        return $boardID;
     }
     //updates whole board data
     public function updateData(array $data, string $boardID)
@@ -48,9 +45,6 @@ class BoardGateway
 
         $this->insertBoardElements('notes', $boardID, $notesArray);
         $this->insertBoardElements('images', $boardID, $imagesArray);
-
-        echo "Updated data for board: " . $boardID;
-        exit;
     }
     public function deleteBoard(string $boardID)
     {
@@ -58,8 +52,6 @@ class BoardGateway
         $stmt = $this->connection->prepare($sql);
         $stmt->bindParam(':boardID', $boardID);
         $stmt->execute();
-        echo "Deleted board: " . $boardID;
-        exit;
     }
     private function deleteBoardElements(string $boardID, string $elementType)
     {
@@ -95,9 +87,8 @@ class BoardGateway
             'boardID' => $boardID,
             'boardData' => $this->jsonFormatBoardData($boardData, $notesData, $imagesData)
         ];
-
-        echo json_encode($result, JSON_PRETTY_PRINT);
-        exit;
+        return $result;
+        //echo json_encode($result, JSON_PRETTY_PRINT);
     }
 
     private function jsonFormatBoardData(array $boardData, array $notesData, array $imagesData)
@@ -228,7 +219,7 @@ class BoardGateway
         do {
             $urlCode = bin2hex(random_bytes(4));
             $doesCodeExist = $this->doesValueExist('boards', 'id', $urlCode);
-            var_dump("generating unique url code");
+            //var_dump("generating unique url code");
         } while ($doesCodeExist == true);
         return $urlCode;
     }
