@@ -3,6 +3,7 @@
 namespace App;
 
 use App\JsonResponseHandler;
+use App\APIkeyAuth;
 
 class BoardController
 {
@@ -11,6 +12,7 @@ class BoardController
     private ?string $boardId;
     //collects all messages in controller and then echoes it to a client side
     private JsonResponseHandler $respond;
+    private APIkeyAuth $checkKeyAuth;
 
     public function __construct(private BoardGateway $gateway, ?array $partsOfUrl = null)
     {
@@ -18,10 +20,17 @@ class BoardController
         $this->resource = $partsOfUrl[0] ?? null;
         $this->boardId = $partsOfUrl[1] ?? null;
         $this->respond = new JsonResponseHandler;
+        $this->checkKeyAuth = new APIkeyAuth($this->respond);
     }
 
     public function processRequest(string $requestMethod): void
     {
+        if (!$this->checkKeyAuth->checkAPIKey()) {
+            http_response_code(401);
+            $this->respond->getResponseJson();
+            return;
+        }
+
         if ($requestMethod == "POST") $this->processPOST();
 
         if ($requestMethod == "GET") $this->processGET();
@@ -37,7 +46,8 @@ class BoardController
         $data = file_get_contents("php://input");
         if ($data == null) {
             http_response_code(422);
-            echo "Recieved null. JSON data is required.";
+            $this->respond->addResponse("Message", "Recieved null. JSON data is required.");
+            $this->respond->addResponse("Data", null);
             return;
         }
 
@@ -57,8 +67,10 @@ class BoardController
         $doesBoardExist = $this->boardIDExists();
         if ($doesBoardExist) {
             $result = $this->gateway->getBoardDataByID($id);
-            $jsonData = json_encode($result, JSON_PRETTY_PRINT);
-            echo $jsonData;
+            //$jsonData = json_encode($result, JSON_PRETTY_PRINT);
+            //echo $jsonData;
+            $this->respond->addResponse("Message", "Acquired data for board: " . $id);
+            $this->respond->addResponse("Data", $result);
         }
     }
     private function processPATCH()
@@ -70,13 +82,15 @@ class BoardController
         $data = file_get_contents("php://input");
         if ($data == null) {
             http_response_code(422);
-            echo "Recieved null. JSON data is required.";
+            $this->respond->addResponse("Message", "Recieved null. JSON data is required.");
+            $this->respond->addResponse("Data", $id);
             return;
         }
 
         $jsonData = json_decode($data, true);
         $this->gateway->updateData($jsonData, $id);
-        echo "Updated data for board with ID: " . $id;
+        $this->respond->addResponse("Message", "Updated data for board with ID: " . $id);
+        $this->respond->addResponse("Data", $id);
     }
     private function processDELETE()
     {
@@ -85,7 +99,8 @@ class BoardController
         if (!$doesBoardExist) return;
 
         $this->gateway->deleteBoard($id);
-        echo "Deleted board: " . $id;
+        $this->respond->addResponse("Message", "Deleted board: " . $id);
+        $this->respond->addResponse("Data", $id);
     }
 
 
@@ -97,14 +112,16 @@ class BoardController
             $boardIdExists = $this->gateway->doesValueExist('boards', 'id', $this->boardId);
         } else {
             http_response_code(422);
-            echo "No board ID was passed in this request";
+            $this->respond->addResponse("Message", "No board ID was passed in this request");
+            $this->respond->addResponse("Data", $this->boardId);
             return false;
         }
         if ($boardIdExists) {
             return true;
         } else {
             http_response_code(404);
-            echo "No board found with this id: " . $this->boardId;
+            $this->respond->addResponse("Message", "No board found with this id: " . $this->boardId);
+            $this->respond->addResponse("Data", $this->boardId);
             return false;
             exit;
         }
