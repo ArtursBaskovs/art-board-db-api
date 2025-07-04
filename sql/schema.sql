@@ -14,19 +14,55 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Dumping data for table boardapp.boards: ~1 rows (approximately)
-REPLACE INTO `boards` (`id`, `boardName`, `created_at`) VALUES
-	('c53cd3c1', 'elf board', '2025-06-23 16:57:33');
+-- Dumping structure for table boardapp.boards
+CREATE TABLE IF NOT EXISTS `boards` (
+  `id` varchar(50) NOT NULL,
+  `boardName` varchar(255) NOT NULL,
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
--- Dumping data for table boardapp.images: ~2 rows (approximately)
-REPLACE INTO `images` (`primaryID`, `id`, `className`, `value`, `posX`, `posY`, `height`, `width`, `link`, `type`, `board_id`) VALUES
-	(14, '1nd_image', 'image-block', '', 1474, 1559, 320, 344, 'https://i.pinimg.com/736x/e4/ea/7d/e4ea7d948cb46bdc3e5b6e309d784275.jpg', 'image', 'c53cd3c1'),
-	(15, '2nd_image', 'image-block', '', 1147, 1587, 320, 320, 'https://i.pinimg.com/736x/22/c2/48/22c24890b11b37eaeeb0cdfe85f3c562.jpg', 'image', 'c53cd3c1');
+-- Data exporting was unselected.
 
--- Dumping data for table boardapp.notes: ~2 rows (approximately)
-REPLACE INTO `notes` (`primaryID`, `id`, `className`, `value`, `posX`, `posY`, `height`, `width`, `link`, `type`, `board_id`) VALUES
-	(14, '1nd_note', 'note-block', 'elven ears', 1467, 1879, 248, 355, '', 'note', 'c53cd3c1'),
-	(15, '2nd_note', 'note-block', 'sdfsdfds', 1221, 1847, 220, 220, '', 'note', 'c53cd3c1');
+-- Dumping structure for table boardapp.images
+CREATE TABLE IF NOT EXISTS `images` (
+  `primaryID` int NOT NULL AUTO_INCREMENT,
+  `id` varchar(36) DEFAULT NULL,
+  `className` varchar(100) DEFAULT NULL,
+  `value` text,
+  `posX` int DEFAULT NULL,
+  `posY` int DEFAULT NULL,
+  `height` int DEFAULT NULL,
+  `width` int DEFAULT NULL,
+  `link` text,
+  `type` varchar(50) DEFAULT NULL,
+  `board_id` varchar(50) DEFAULT NULL,
+  PRIMARY KEY (`primaryID`),
+  KEY `board_id` (`board_id`),
+  CONSTRAINT `images_ibfk_1` FOREIGN KEY (`board_id`) REFERENCES `boards` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=63 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- Data exporting was unselected.
+
+-- Dumping structure for table boardapp.notes
+CREATE TABLE IF NOT EXISTS `notes` (
+  `primaryID` int NOT NULL AUTO_INCREMENT,
+  `id` varchar(36) DEFAULT NULL,
+  `className` varchar(100) DEFAULT NULL,
+  `value` text,
+  `posX` int DEFAULT NULL,
+  `posY` int DEFAULT NULL,
+  `height` int DEFAULT NULL,
+  `width` int DEFAULT NULL,
+  `link` text,
+  `type` varchar(50) DEFAULT NULL,
+  `board_id` varchar(50) DEFAULT NULL,
+  PRIMARY KEY (`primaryID`),
+  KEY `board_id` (`board_id`),
+  CONSTRAINT `notes_ibfk_1` FOREIGN KEY (`board_id`) REFERENCES `boards` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=63 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- Data exporting was unselected.
 
 /*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
