@@ -1,6 +1,7 @@
 FROM php:8.2-apache
 
-RUN apt-get update && apt-get install -y unzip git && \
+RUN apt-get update && apt-get install -y unzip git default-mysql-client libonig-dev libzip-dev libpng-dev libxml2-dev && \
+    docker-php-ext-install pdo pdo_mysql mysqli && \
     curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
 RUN a2enmod rewrite
