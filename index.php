@@ -19,7 +19,7 @@ header("Access-Control-Allow-Methods: OPTIONS, GET, POST, PATCH, PUT, DELETE");
 header("Access-Control-Max-Age: 3600");
 header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
 
-require_once __DIR__ . '/vendor/autoload.php';
+require_once __DIR__ . '/autoload.php';
 
 use App\BoardController;
 use App\BoardGateway;
