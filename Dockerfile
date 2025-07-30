@@ -1,18 +1,17 @@
-FROM php8.2-apache
+FROM php:8.2-apache
 
 RUN a2enmod rewrite
 
 RUN docker-php-ext-install pdo pdo_mysql
 
-COPY . varwwwhtml
+COPY . /var/www/html/
 
-RUN chown -R www-datawww-data varwwwhtml
+RUN echo '<Directory /var/www/html/>\n\
+    AllowOverride All\n\
+    Require all granted\n\
+</Directory>' >> /etc/apache2/apache2.conf
 
-RUN chmod -R 755 varwwwhtml
-
-RUN echo Directory varwwwhtmln
-    AllowOverride Alln
-    Require all grantedn
-Directory  etcapache2apache2.conf
+RUN chown -R www-data:www-data /var/www/html
+RUN chmod -R 755 /var/www/html
 
 EXPOSE 80
