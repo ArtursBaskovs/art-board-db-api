@@ -17,10 +17,11 @@ class DBconnection
 
         try {
             $dbh = new PDO(
-                'mysql:host=' . $_ENV['DATABASE_HOST'] . ';dbname=' . $_ENV['DATABASE_NAME'],
+                'mysql:host=' . $_ENV['DATABASE_HOST'] . ';port=' . $_ENV['DATABASE_PORT'] . ';dbname=' . $_ENV['DATABASE_NAME'],
                 $_ENV['DATABASE_USER'],
                 $_ENV['DATABASE_PASSWORD']
             );
+
             $dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
             $dbh->setAttribute(PDO::ATTR_STRINGIFY_FETCHES, false);
 

@@ -30,6 +30,7 @@ class BoardController
             $this->respond->getResponseJson();
             return;
         }
+        //var_dump($this->resource);
 
         if ($requestMethod == "POST") $this->processPOST();
 
