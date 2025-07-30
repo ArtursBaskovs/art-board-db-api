@@ -11,8 +11,12 @@ class DBconnection
 {
     public function connect()
     {
-        $dotenv = Dotenv::createImmutable(__DIR__ . '/../');
-        $dotenv->load();
+        /*$dotenv = Dotenv::createImmutable(__DIR__ . '/../');
+        $dotenv->load();*/
+
+        if (file_exists(__DIR__ . '/../.env')) {
+            Dotenv::createImmutable(__DIR__ . '/../')->load();
+        }
 
         //.
         try {
