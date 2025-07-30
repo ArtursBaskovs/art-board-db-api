@@ -11,8 +11,9 @@ RUN sed -i 's/AllowOverride None/AllowOverride All/i' /etc/apache2/apache2.conf
 
 ENV COMPOSER_ALLOW_SUPERUSER=1
 
-COPY . .
-
+COPY composer.json composer.lock ./
 RUN composer install --no-dev --optimize-autoloader
+
+COPY . .
 
 RUN chown -R www-data:www-data /var/www/html
