@@ -14,7 +14,7 @@ class DBconnection
         $dotenv = Dotenv::createImmutable(__DIR__ . '/../');
         $dotenv->load();
 
-
+        //.
         try {
             $dbh = new PDO(
                 'mysql:host=' . $_ENV['DATABASE_HOST'] . ';port=' . $_ENV['DATABASE_PORT'] . ';dbname=' . $_ENV['DATABASE_NAME'],
