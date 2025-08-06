@@ -18,4 +18,16 @@ RESTful API for the Art Board project — stores board data, notes, and images i
 - Setup connection info in .env file
 
 ## API Endpoints
-Didn`t do it yet.
+GET: /board/{id}
+POST: json file via file_get_contents("php://input")
+PATCH: json file via file_get_contents("php://input")
+DELETE: /board/{id}
+
+## env file template
+DATABASE_HOST=*******
+DATABASE_PORT=*******
+DATABASE_NAME=*******
+DATABASE_USER=*******
+DATABASE_PASSWORD=*******
+
+API_KEY=*******
