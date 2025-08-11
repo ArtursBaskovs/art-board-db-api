@@ -19,8 +19,11 @@ RESTful API for the Art Board project — stores board data, notes, and images i
 
 ## API Endpoints
 GET: /board/{id}
+
 POST: json file via file_get_contents("php://input")
+
 PATCH: json file via file_get_contents("php://input")
+
 DELETE: /board/{id}
 
 ## env file template
